@@ -53,11 +53,12 @@ def generate_one(example, lang, model):
             "expert": "llama3-8b"
         }
         url = os.environ.get("SAMBA_URL")
+        key = os.environ.get("SAMBA_KEY")
         headers = {
-            "Authorization": f"Basic {os.environ.get("SAMBA_KEY")}",
+            "Authorization": f"Basic {key}",
             "Content-Type": "application/json"
         }
-        post_response = requests.post(url, json=payload, headers=headers, stream=True)
+        post_response = requests.post(f'https://{url}/api/v1/chat/completion', json=payload, headers=headers, stream=True)
 
         response_text = ""
         for line in post_response.iter_lines():

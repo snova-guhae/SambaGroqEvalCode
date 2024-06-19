@@ -69,7 +69,7 @@ def convert_for_evaluation(example):
 def generate_one(example, model):
     prompt = example['prompt']
     messages = [{'role': 'user', 'content': prompt }]
-    if model == "Groq":
+    if model == "groq":
         client = Groq(
             api_key=os.environ['GROQ_API_KEY'],
         )
@@ -85,7 +85,7 @@ def generate_one(example, model):
                 time.sleep(5)
                 continue
             break
-    elif model == "Samba":
+    elif model == "samba":
         payload = {
             "inputs": messages,
             "params": {
@@ -98,12 +98,12 @@ def generate_one(example, model):
         }
         url = os.environ.get("SAMBA_URL")
         key = os.environ.get("SAMBA_KEY")
-
+        
         headers = {
             "Authorization": f"Basic {key}",
             "Content-Type": "application/json"
         }
-        post_response = requests.post(url, json=payload, headers=headers, stream=True)
+        post_response = requests.post(f'https://{url}/api/v1/chat/completion', json=payload, headers=headers, stream=True)
 
         response_text = ""
         for line in post_response.iter_lines():
@@ -158,6 +158,7 @@ def generate_main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model', type=str, help="model name or path")
+    parser.add_argument('--language', type=str, help="programming language")
     parser.add_argument('--output_path', type=str, help="output path of your generation")
     parser.add_argument('--temp_dir', type=str, help="temp dir for evaluation", default="tmp")
     args = parser.parse_args()
